@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Quote it!</string>
+    <string name="back4app_server_url">https://parseapi.back4app.com/</string>
+
+    <!-- Change the following strings as required -->
+    <string name="back4app_app_id">1MO8sMwgkNOlnfdMxc7esphq6p5f7S36Hh2UAQsk</string>
+    <string name="back4app_client_key">cSrtVcFKr2phib3gAggv8Oh4njDKIuRTN6qD4msU</string>
+    <string name="email">Email</string>
+    <string name="new_signup">New? Click here to Sign Up</string>
+    <string name="old_user">Already Registered? Login here</string>
+
+</resources>

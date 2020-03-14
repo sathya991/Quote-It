@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/linearLayout"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:orientation="vertical">
+    <LinearLayout android:layout_width="match_parent"
+    android:layout_height="50dp"
+    android:orientation="horizontal"
+    style="?attr/buttonBarStyle">
+    <Button
+        android:id="@+id/buttonOne"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:text="Recently Added"
+        android:onClick="recentPosts"
+        android:textColor="#000000" />
+
+    <Button
+        android:id="@+id/buttonTwo"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:onClick="mostLikedPosts"
+        android:text="Most Liked"
+        android:textColor="#000000" />
+    </LinearLayout>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/scrollView">
+
+    </ScrollView>
+</LinearLayout>
