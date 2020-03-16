@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -28,22 +29,21 @@ import java.util.List;
 import java.util.Objects;
 
 public class TextQuoteFeed extends AppCompatActivity {
-    ScrollView scrollView;
+    LinearLayout linearLayout;
     int limit = 50, i = 0;
     LayoutInflater vi;
     boolean like = false;
     ImageView ig;
     View v;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_text_quote_feed);
-        scrollView = findViewById(R.id.scrollView);
+        linearLayout = findViewById(R.id.linearLayout);
         vi = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         assert vi != null;
-        v = vi.inflate(R.layout.text_post, null);
-        ig = v.findViewById(R.id.likeVIew);
+        View vv = vi.inflate(R.layout.text_post, null);
+        ig = vv.findViewById(R.id.likeVIew);
         ig.setOnClickListener(liked);
     }
 
@@ -78,19 +78,24 @@ public class TextQuoteFeed extends AppCompatActivity {
             public void done(List<ParseObject> quotes, ParseException e) {
                 if (e == null) {
                     for (ParseObject object : quotes) {
-                        if (i == limit) {
-                            i = 0;
-                            break;
-                        }
+                        Log.i("List",object.get("quote").toString());
+//                        if (i == limit) {
+//                            i = 0;
+//                            break;
+//                        }
+                        v = vi.inflate(R.layout.text_post, null,false);
                         TextView textView = v.findViewById(R.id.quoteView);
                         textView.setText(Objects.requireNonNull(object.get("quote")).toString());
-                        scrollView.addView(v);
+//                        if(v.getParent() != null) {
+//                            ((ViewGroup)v.getParent()).removeView(v);
+//                        }
                         ImageView imageView = v.findViewById(R.id.likeVIew);
                         imageView.setImageResource(R.drawable.heart2);
                         TextView usernameView = v.findViewById(R.id.usernameView);
                         usernameView.setText(Objects.requireNonNull(object.get("user")).toString());
                         TextView likeNumber = v.findViewById(R.id.likeNumber);
                         likeNumber.setText(Objects.requireNonNull(object.get("likes")).toString());
+                        linearLayout.addView(v);
                         i++;
                     }
                 } else {
@@ -105,6 +110,7 @@ public class TextQuoteFeed extends AppCompatActivity {
 
     private View.OnClickListener liked = new View.OnClickListener() {
         public void onClick(View view) {
+            View v = vi.inflate(R.layout.text_post, null);
             final ImageView imageView = v.findViewById(R.id.likeVIew);
             final TextView textView = v.findViewById(R.id.quoteView);
             final TextView likeNumber = v.findViewById(R.id.likeNumber);
@@ -124,6 +130,7 @@ public class TextQuoteFeed extends AppCompatActivity {
                             } else {
                                 object.put("likes", likesNow-1);
                                 likesNow--;
+                                object.remove("likedUsers");
                                 imageView.setImageResource(R.drawable.heart2);
                                 like = false;
                             }
