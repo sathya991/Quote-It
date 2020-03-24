@@ -33,8 +33,8 @@ public class TextQuoteFeed extends AppCompatActivity {
     int limit = 50, i = 0;
     LayoutInflater vi;
     boolean like = false;
-    ImageView ig;
     View v;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,9 +42,11 @@ public class TextQuoteFeed extends AppCompatActivity {
         linearLayout = findViewById(R.id.linearLayout);
         vi = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         assert vi != null;
-        View vv = vi.inflate(R.layout.text_post, null);
-        ig = vv.findViewById(R.id.likeVIew);
-        ig.setOnClickListener(liked);
+        newPosts();
+    }
+
+    public void layoutInflator() {
+        v = vi.inflate(R.layout.text_post, linearLayout, false);
     }
 
     @Override
@@ -71,26 +73,23 @@ public class TextQuoteFeed extends AppCompatActivity {
         startActivity(startMain);
     }
 
-    public void recentPosts(View view) {
+    public void newPosts() {
         final ParseQuery<ParseObject> query = ParseQuery.getQuery("Quote");
-        query.orderByAscending("createdAt");
+        query.orderByDescending("createdAt");
         query.findInBackground(new FindCallback<ParseObject>() {
             public void done(List<ParseObject> quotes, ParseException e) {
                 if (e == null) {
                     for (ParseObject object : quotes) {
-                        Log.i("List",object.get("quote").toString());
-//                        if (i == limit) {
-//                            i = 0;
-//                            break;
-//                        }
-                        v = vi.inflate(R.layout.text_post, null,false);
+                        if (i == limit) {
+                            i = 0;
+                            break;
+                        }
+                        layoutInflator();
                         TextView textView = v.findViewById(R.id.quoteView);
                         textView.setText(Objects.requireNonNull(object.get("quote")).toString());
-//                        if(v.getParent() != null) {
-//                            ((ViewGroup)v.getParent()).removeView(v);
-//                        }
                         ImageView imageView = v.findViewById(R.id.likeVIew);
                         imageView.setImageResource(R.drawable.heart2);
+                        imageView.setOnClickListener(liked);
                         TextView usernameView = v.findViewById(R.id.usernameView);
                         usernameView.setText(Objects.requireNonNull(object.get("user")).toString());
                         TextView likeNumber = v.findViewById(R.id.likeNumber);
@@ -105,37 +104,47 @@ public class TextQuoteFeed extends AppCompatActivity {
         });
     }
 
+    public void recentPosts(View view) {
+        linearLayout.removeAllViews();
+        newPosts();
+    }
+
     public void mostLikedPosts(View view) {
     }
 
-    private View.OnClickListener liked = new View.OnClickListener() {
+    public View.OnClickListener liked = new View.OnClickListener() {
         public void onClick(View view) {
-            View v = vi.inflate(R.layout.text_post, null);
-            final ImageView imageView = v.findViewById(R.id.likeVIew);
-            final TextView textView = v.findViewById(R.id.quoteView);
-            final TextView likeNumber = v.findViewById(R.id.likeNumber);
+            View vv = (View) view.getParent();
+            final ImageView imageView = vv.findViewById(R.id.likeVIew);
+            final TextView textView = vv.findViewById(R.id.quoteView);
+            final TextView likeNumber = vv.findViewById(R.id.likeNumber);
             ParseQuery<ParseObject> likeOb = new ParseQuery("Quote");
+            likeOb.orderByDescending("createdAt");
             likeOb.findInBackground(new FindCallback<ParseObject>() {
                 @Override
                 public void done(List<ParseObject> objects, ParseException e) {
                     for (ParseObject object : objects) {
                         if ((object.get("quote").toString()).equals(textView.getText().toString())) {
                             int likesNow = Integer.parseInt(String.valueOf(object.get("likes")));
+                            Log.i("likesnow before", String.valueOf(likesNow));
                             if (!like) {
-                                object.put("likes", likesNow+1);
+                                object.put("likes", likesNow + 1);
                                 likesNow++;
+                                Log.i("likesnow liked", String.valueOf(likesNow));
                                 imageView.setImageResource(R.drawable.heart);
-                                object.put("likedUsers",ParseUser.getCurrentUser().getUsername());
+                                //object.put("likedUsers", ParseUser.getCurrentUser().getUsername());
                                 like = true;
+                                object.saveInBackground();
                             } else {
-                                object.put("likes", likesNow-1);
+                                object.put("likes", likesNow - 1);
                                 likesNow--;
-                                object.remove("likedUsers");
+                                Log.i("likesnow removed like", String.valueOf(likesNow));
+                               // object.remove("likedUsers");
                                 imageView.setImageResource(R.drawable.heart2);
                                 like = false;
+                                object.saveInBackground();
                             }
                             likeNumber.setText(String.valueOf(likesNow));
-                            object.saveInBackground();
                         }
                     }
                 }
